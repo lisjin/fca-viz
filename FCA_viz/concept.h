@@ -25,11 +25,11 @@ struct BitObj {
     vector<BitObj*> parents;
     vector<BitObj*> children;
     bitset<MAX> A;
-    bitset<MAX> attr;
+    bitset<MAX> B;
     pair<int, int> coord;
     int weight;
     BitObj() : A(0), weight(0) {}
-    BitObj(bitset<MAX> A, bitset<MAX> a, int w) : A(A), attr(a), weight(w) {}
+    BitObj(bitset<MAX> A, bitset<MAX> a, int w) : A(A), B(a), weight(w) {}
     void setWeight(int num_obs) {
         this->weight = 0;
         for (int h = 0; h < num_obs; ++h) {
@@ -89,7 +89,7 @@ void printAts(const BitObj &cur, int num_ats) {
         'o','p','q','r','s','t','u','v','w','x','y','z'};
     cout << '\t' << "{ ";
     for (int i = 0; i < num_ats; ++i) {
-        if (cur.attr[i])
+        if (cur.B[i])
             cout << alpha[i] << ' ';
     }
     cout << '}';

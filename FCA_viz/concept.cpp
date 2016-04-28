@@ -20,7 +20,7 @@ static bool isNext(const bitset<MAX> prev, const bitset<MAX> A, int i) {
     return prev == calcInter(A, i);
 }
 
-static pair<bitset<MAX>, bitset<MAX> > nextClos(const vector<bitset<MAX> > mat,
+static pair<bitset<MAX>, bitset<MAX> > nextClos(const vector<bitset<MAX> > in,
                                                 BitObj &cur, int i,
                                                 int num_obs) {
     bitset<MAX> inter, res, old_inter;
@@ -30,12 +30,12 @@ static pair<bitset<MAX>, bitset<MAX> > nextClos(const vector<bitset<MAX> > mat,
     if (!cur.A[i]) { //set union
         cur.A.set(i);
     }
-    for (int j = 0; j < mat.size(); ++j) { //store common attributes in res
+    for (int j = 0; j < in.size(); ++j) { //store common attributes in res
         if (cur.A[j])
-            res &= mat[j];
+            res &= in[j];
     }
-    for (int j = 0; j < mat.size(); ++j) { //find extent
-        if (!cur.A[j] && isSubset(mat[j], res)) {
+    for (int j = 0; j < in.size(); ++j) { //find extent
+        if (!cur.A[j] && isSubset(in[j], res)) {
             cur.A.set(j);
         }
     }
@@ -64,26 +64,23 @@ void findConc(vector<string> input, unordered_set<bitset<MAX> > &concepts,
     vector<bitset<MAX> > in = parseBitsets(input, num_obs, num_ats);
     
     BitObj cur;
-    bitset<MAX> intent, stop; //set stopping condition (all objects)
-    for (int i = 0; i < num_obs; ++i) {
+    bitset<MAX> intent, stop;
+    for (int i = 0; i < num_ats; ++i) { //fill all attributes
+        intent.set(i);
+    }
+    for (int i = 0; i < num_obs; ++i) { //set stopping condition (all objects), find initial A
         stop.set(i);
-    }
-    for (int i = 0; i < num_ats; ++i) {
-        intent.set(i); //fill all attributes
-    }
-    for (int i = 0; i < num_obs; ++i) { //find initial A
         if (in[i] == intent) {
             cur.A.set(i);
-            ++cur.weight;
+            cur.setWeight(num_obs);
         }
     }
-    cur.attr = intent;
+    cur.B = intent;
     concepts.insert(cur.A);
-    BitObj *b = new BitObj(cur.A, cur.attr, 0);
+    BitObj *b = new BitObj(cur.A, cur.B, 0);
     extents.push_back(b);
     bitset<MAX> prev;
     pair<bitset<MAX>, bitset<MAX> > result;
-    int count = 1;
     while (cur.A != stop) {
         for (int n = num_obs - 1; n >= 0; --n) {
             result = nextClos(in, cur, n, num_obs);
@@ -91,11 +88,13 @@ void findConc(vector<string> input, unordered_set<bitset<MAX> > &concepts,
             if (concepts.find(cur.A) == concepts.end() &&
                 isNext(prev, cur.A, n)) {
                 cur.setWeight(num_obs);
-                cur.attr = result.second;
+                cur.B = result.second;
                 concepts.insert(cur.A);
-                BitObj *b = new BitObj(cur.A, cur.attr, cur.weight);
+                BitObj *b = new BitObj(cur.A, cur.B, cur.weight);
                 extents.push_back(b);
-                ++count;
+                //REMOVE
+                printObj(cur.A, cout, num_obs);
+                //REMOVE
                 break;
             }
             else
@@ -265,7 +264,6 @@ int main(int argc, const char * argv[]) {
                     break;
             }
         }
-        
         for (BitObj *b : extents)
             delete b;
     }

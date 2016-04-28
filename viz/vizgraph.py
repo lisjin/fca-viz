@@ -106,35 +106,39 @@ def plot_graph(G, titl='', nodesize=300, widthsize=1.5, plotfname='/tmp/tmp.png'
     from mpltools import style, layout
     style.use('ggplot')
 
-    props = dict(boxstyle='round', facecolor='wheat', alpha=0.5)
     cm = plt.get_cmap('cool')
     cm.set_under('w')
 
     f = plt.figure(1)
     ax = f.add_subplot(1,1,1)
 
-    txtstr = '%d nodes, %d edges' % (G.number_of_nodes(), G.number_of_edges())
-    ax.text(0.02, 0.98, txtstr, transform=ax.transAxes, fontsize=12, verticalalignment='top', bbox=props)
+    obs = open('obs.txt', 'r').read().split('\n')
+    obs = [o.decode('utf-8')[:-1] for o in obs if len(o) > 0]
+    txtstr = ''
+    # for k, v in enumerate(obs[::-1]):
+    #     txtstr += '%d: {%s}' % (len(obs) - k - 1, v) + '\n'
+
+
+    # titl = '%d nodes, %d edges' % (G.number_of_nodes(), G.number_of_edges())
+    f.text(0.02, 0.98, txtstr, transform=ax.transAxes, verticalalignment='top')
     plt.title(titl)
 
     pos = nx.get_node_attributes(G,'xy')
 
     nodes = nx.draw_networkx_nodes(G, pos, cmap = cm, node_color='c', labels=None, with_labels=False, ax=ax, node_size=nodesize)
     edges = nx.draw_networkx_edges(G, pos, width=widthsize, ax=ax)
-    obs = open('obs.txt', 'r').read().split('\n')
-    obs = [o.decode('utf-8')[:-1] for o in obs if len(o) > 0]
 
     pos_short = {}
-    for k,v in enumerate(obs):
+    # for i in range(0, len(obs)):
+    #     pos_short[i] = '%d' % i
+    for k, v in enumerate(obs):
         pos_short[k] = '{%s}' % v
     labels = nx.draw_networkx_labels(G, pos, labels=pos_short, font_size=8)
 
     plt.axis('off')
     f.set_facecolor('w')
 
-    f.tight_layout()
-
-    plt.savefig(plotfname, dpi=300)
+    plt.savefig(plotfname, dpi=300, bbox_inches='tight')
     plt.clf()
     return 0
 

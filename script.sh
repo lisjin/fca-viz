@@ -1,5 +1,5 @@
 FCA_XCODE=~/Documents/Programs/FCA_viz
-VIZ=~/Downloads/Research/viz
+VIZ=~/Downloads/Research/FCA/viz
 
 echo "Edit input file"
 open $FCA_XCODE/FCA_viz/input.txt
